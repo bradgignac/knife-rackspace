@@ -45,7 +45,7 @@ class Chef
         :short => "-I IMAGE",
         :long => "--image IMAGE",
         :description => "The image of the server",
-        :proc => Proc.new { |i| Chef::Config[:knife][:image] = i.to_i }
+        :proc => Proc.new { |i| Chef::Config[:knife][:image] = i.to_s }
 
       option :server_name,
         :short => "-S NAME",
@@ -101,7 +101,7 @@ class Chef
         :description => "Comma separated list of roles/recipes to apply",
         :proc => lambda { |o| o.split(/[\s,]+/) },
         :default => []
-        
+
       option :first_boot_attributes,
         :short => "-j JSON_ATTRIBS",
         :long => "--json-attributes",
@@ -170,13 +170,13 @@ class Chef
         puts("\n")
 
         puts "#{ui.color("Public DNS Name", :cyan)}: #{public_dns_name(server)}"
-        puts "#{ui.color("Public IP Address", :cyan)}: #{server.addresses["public"][0]}"
-        puts "#{ui.color("Private IP Address", :cyan)}: #{server.addresses["private"][0]}"
+        puts "#{ui.color("Public IP Address", :cyan)}: #{public_ip(server)}"
+        puts "#{ui.color("Private IP Address", :cyan)}: #{private_ip(server)}"
         puts "#{ui.color("Password", :cyan)}: #{server.password}"
 
         print "\n#{ui.color("Waiting for sshd", :magenta)}"
 
-        print(".") until tcp_test_ssh(server.addresses["public"][0]) { sleep @initial_sleep_delay ||= 10; puts("done") }
+        print(".") until tcp_test_ssh(public_ip(server)) { sleep @initial_sleep_delay ||= 10; puts("done") }
 
         bootstrap_for_node(server).run
 
@@ -188,8 +188,8 @@ class Chef
         puts "#{ui.color("Image", :cyan)}: #{server.image.name}"
         puts "#{ui.color("Metadata", :cyan)}: #{server.metadata}"
         puts "#{ui.color("Public DNS Name", :cyan)}: #{public_dns_name(server)}"
-        puts "#{ui.color("Public IP Address", :cyan)}: #{server.addresses["public"][0]}"
-        puts "#{ui.color("Private IP Address", :cyan)}: #{server.addresses["private"][0]}"
+        puts "#{ui.color("Public IP Address", :cyan)}: #{public_ip(server)}"
+        puts "#{ui.color("Private IP Address", :cyan)}: #{private_ip(server)}"
         puts "#{ui.color("Password", :cyan)}: #{server.password}"
         puts "#{ui.color("Environment", :cyan)}: #{config[:environment] || '_default'}"
         puts "#{ui.color("Run List", :cyan)}: #{config[:run_list].join(', ')}"

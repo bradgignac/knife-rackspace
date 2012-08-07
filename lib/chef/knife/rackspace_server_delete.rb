@@ -28,7 +28,7 @@ class Chef
 
       def run
         @name_args.each do |instance_id|
-          
+
           server = connection.servers.get(instance_id)
 
           msg("Instance ID", server.id.to_s)
@@ -36,8 +36,8 @@ class Chef
           msg("Name", server.name)
           msg("Flavor", server.flavor.name)
           msg("Image", server.image.name)
-          msg("Public DNS Name", server.addresses["public"][0])
-          msg("Private IP Address", server.addresses["private"][0])
+          msg("Public DNS Name", public_ip(server))
+          msg("Private IP Address", private_ip(server))
 
           puts "\n"
           confirm("Do you really want to delete this server")
